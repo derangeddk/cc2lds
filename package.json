@@ -12,6 +12,15 @@
   },
   "description": "A list of official country-code second-level domains, in case you need that sort of thing.",
   "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./tree": "./tree.js"
+  },
   "author": "Niels Abildgaard <niels@deranged.dk>",
+  "homepage": "https://github.com/derangeddk/cc2lds/blob/master/README.md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/derangeddk/cc2lds"
+  },
   "license": "ISC"
 }
