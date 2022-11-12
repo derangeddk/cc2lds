@@ -1,6 +1,6 @@
 {
   "name": "cc2lds",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "files": [
     "output/2lds.json",
     "output/2lds.yml",
