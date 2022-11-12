@@ -1,0 +1,17 @@
+{
+  "name": "cc2lds",
+  "version": "0.0.3",
+  "files": [
+    "output/2lds.json",
+    "output/2lds.yml",
+    "index.js",
+    "README.md"
+  ],
+  "scripts": {
+    "prepack": "cargo run"
+  },
+  "description": "A list of official country-code second-level domains, in case you need that sort of thing.",
+  "main": "index.js",
+  "author": "Niels Abildgaard <niels@deranged.dk>",
+  "license": "ISC"
+}

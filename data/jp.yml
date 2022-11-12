@@ -1,0 +1,14 @@
+# Source: https://en.wikipedia.org/wiki/.jp#Second_level_domains (accessed 2022-11-11)
+
+jp:
+- ac
+- ad
+- co
+- ed
+- go
+- gr
+- lg
+- ne
+- or
+
+# TODO: Geographical areas have their own domain names, and it seems to be a pretty deep structure? Would be cool to support, too.

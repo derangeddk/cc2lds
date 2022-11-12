@@ -1,0 +1,30 @@
+# Source: https://en.wikipedia.org/wiki/.za#Second-level_domains (accessed 2022-11-11)
+
+za:
+- ac
+- co
+- edu
+- gov
+- law
+- mil
+- net
+- nom
+- org
+- value: school
+  children:
+  - ecape
+  - fs
+  - gp
+  - kzn
+  - mpm
+  - ncape
+  - lp
+  - nw
+  - wcape
+- web
+- alt
+- ngo
+- tm
+- agric
+- grondar
+- nis
