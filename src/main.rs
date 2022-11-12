@@ -1,4 +1,5 @@
-use std::{fs::{self, DirEntry}, fmt::Display};
+use std::{fs::{self, DirEntry}, fmt::Display, collections::HashMap};
+use serde::ser::SerializeMap;
 use yaml_rust::{YamlLoader, Yaml}; //TODO: replace yaml_rust with serde_yaml
 
 pub enum DataHandlingError {
@@ -76,11 +77,13 @@ fn main() {
     }
 }
 
+#[derive(Clone)]
 struct DomainTreeItem {
     value: String,
     children: Option<Vec<DomainTreeItem>>,
 }
 
+#[derive(Clone)]
 struct DomainTreeRoot {
     children: Vec<DomainTreeItem>,
 }
@@ -106,8 +109,66 @@ impl FlattenableTree<String> for DomainTreeRoot {
     }
 }
 
+enum CompactTree {
+    Node(HashMap<String, CompactTree>),
+    Leaf(u8),
+}
+
+trait CompactableTree {
+    fn compact(self) -> CompactTree;
+}
+
+impl CompactableTree for DomainTreeRoot {
+    fn compact(self) -> CompactTree {
+        return self.children.compact();
+    }
+}
+
+impl CompactableTree for DomainTreeItem {
+    fn compact(self) -> CompactTree {
+        match self.children {
+            Some(children) => children.compact(),
+            None => CompactTree::Leaf(1),
+        }
+    }
+}
+
+impl CompactableTree for Vec<DomainTreeItem> {
+    fn compact(self) -> CompactTree {
+        let mut map = HashMap::new();
+
+        for child in self {
+            let key = child.value.clone();
+            let value = child.compact();
+            map.insert(key, value);
+        }
+
+        return CompactTree::Node(map);
+    }
+}
+
+impl serde::ser::Serialize for CompactTree {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where
+            S: serde::Serializer {
+        match self {
+            Self::Leaf(i) => serializer.serialize_u8(*i),
+            Self::Node(n) => {
+                let mut serialize_map = serializer.serialize_map(Some(n.len()))?;
+
+                for (k, v) in n {
+                    serialize_map.serialize_entry(k, v)?;
+                }
+
+                return serialize_map.end();
+            },
+        }
+    }
+}
+
 fn flatten_domain_tree_item_with_prefix(item: DomainTreeItem, suffix: String) -> Vec<String> {
-    let mut vec = vec![format!(".{}{}", item.value, suffix)];
+    let item_self: String = format!(".{}{}", item.value, suffix);
+    let mut vec: Vec<String> = vec![item_self];
 
     match item.children {
         Some(children) => {
@@ -228,7 +289,17 @@ fn load_yaml_docs(dir: &str) -> Result<Vec<Yaml>, DataHandlingError> {
 }
 
 fn output_lists(full_set: DomainTreeRoot) -> Result<(), std::io::Error> {
-    let fully_qualified_list: Vec<String> = full_set.flatten();
+    // Output tree-like structure
+    let compacted_tree = full_set.clone().compact();
+
+    let json_tree = serde_json::to_string(&compacted_tree).unwrap(); // TODO: get rid og unwrap
+    fs::write("output/2lds-tree.json", json_tree)?;
+
+    let yml_tree = serde_yaml::to_string(&compacted_tree).unwrap(); // TODO: get rid og unwrap
+    fs::write("output/2lds-tree.yml", yml_tree)?;
+
+    // Output list-variant
+    let fully_qualified_list = full_set.flatten();
 
     let json = serde_json::to_string(&fully_qualified_list).unwrap(); //TODO: et rid of unwrap
     fs::write("output/2lds.json", json)?;
