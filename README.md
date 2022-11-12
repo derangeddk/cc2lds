@@ -33,6 +33,30 @@ import cc2lds from 'cc2lds';
 // `cc2lds` now contains the latest data
 ```
 
+
+There are also tree-versions -- slightly denser and can be navigated more quickly once loaded into memory -- where you can check if a domain is generally managed (i.e. not open for general registration) by progressively checking its path:
+
+```js
+import cc2ldsTree from 'cc2lds/tree';
+
+const uk = cc2ldsTree.uk; //truthy, so ".uk" is a regulated domain
+const acUk = uk.ac; //truthy, so ".ac.uk" is a regulated domain
+const huh = acUk.co; //falsy, so .co.ac.uk" is not a known regulated domain
+```
+
+You can use modern syntax for a nice little shorthand:
+
+```js
+if(cc2ldsTree.uk?.ac?) {
+    //This block is reached, because ".ac.uk" is known and regulated.
+}
+```
+
+These data formats can also be downloaded from unpkg:
+
+- https://unpkg.com/cc2lds/output/2lds-tree.json
+- https://unpkg.com/cc2lds/output/2lds-tree.yml
+
 ## FAQ
 
 - **What about top-level domains?** IANA (the official authority) has [a nice central list of all TLDs](http://www.iana.org/domains/root/db), and it's even available as an [easily parseable text format](https://data.iana.org/TLD/tlds-alpha-by-domain.txt). The goal of this project is to make officially supported 2lds and 3lds as easily accessible as the above. Most countries don't have as easily parseable a list as IANA, though it would be neat if they did - then we could automate collecting everything!
